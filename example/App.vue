@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <main>
     <a href="https://github.com/SortableJS/Vue.Draggable" target="_blank">
       <img
         style="position: fixed; top: 0; right: 0; border: 0; z-index:99999"
@@ -12,15 +12,11 @@
       />
     </a>
 
-    <div class="container ">
-      <div class="jumbotron logo">
-        <img
-          class="draggable"
-          alt="Vue.draggable logo"
-          src="./assets/logo.svg"
-        />
+    <header class="header">
+      <div class="container">
+        <img src="./assets/logo.svg" class="header__logo" />
 
-        <div id="badges">
+        <div class="header__badges">
           <a
             target="_blank"
             href="https://circleci.com/gh/SortableJS/Vue.Draggable"
@@ -28,9 +24,7 @@
               src="https://circleci.com/gh/SortableJS/Vue.Draggable.svg?style=shield"
             />
           </a>
-          <a
-            target="_blank"
-            href="https://codecov.io/gh/SortableJS/Vue.Draggable"
+          <a target="_blank" href="https://codecov.io/gh/SortableJS/Vue.Draggable"
             ><img
               src="https://codecov.io/gh/SortableJS/Vue.Draggable/branch/master/graph/badge.svg"
             />
@@ -67,58 +61,51 @@
           </a>
         </div>
       </div>
+    </header>
 
-      <ul class="nav nav-tabs" role="tablist">
-        <li
-          class="nav-item"
-          v-for="component in componentList"
-          :key="component.name"
-        >
-          <a
-            class="nav-link"
-            data-toggle="tab"
-            :data-route="`/${component.name}`"
-            :href="`#${component.name}`"
-            role="tab"
-            aria-controls="profile"
-            >{{ component.display }}</a
+    <section class="stage container">
+      <aside class="stage__sidebar">
+        <ul class="sidebar__list" role="tablist">
+          <li
+            v-for="component in componentList"
+            class="sidebar__list-item"
+            :class="{'active': currentComponent.name === component.name}"
+            :key="component.name"
           >
-        </li>
-      </ul>
+            <a href="#" @click="setCurrentComponent(component)">
+              {{ component.display }}
+            </a>
+          </li>
+        </ul>
+      </aside>
 
-      <div class="tab-content" id="tab-content">
-        <div
-          class="tab-pane show"
-          :id="component.name"
-          role="tabpanel"
-          aria-labelledby="profile-tab"
-          v-for="component in componentList"
-          :key="component.name"
-        >
-          <div class=" justify-content-center jumbotron main-container">
-            <div class="row icon-container">
-              <div>{{ component.instruction }}</div>
+      <article class="stage__components">
+        <header class="stage__components--header">
+          <h2>{{ currentComponent.name }}</h2>
+          <a
+            class="icon-github"
+            target="_blank"
+            :href="
+              `https://github.com/SortableJS/Vue.Draggable/blob/master/example/components/${currentComponent.name}.vue`
+            "
+          >
+            View code
+            <i class="fa fa-github icon-large"></i>
+          </a>
+        </header>
+        
+        <div class="stage__components--body">
+          <div class="card">
+            
+            <div class="card-body">
+            <component :is="currentComponent.name"></component>
 
-              <a
-                class="icon github"
-                target="_blank"
-                :href="
-                  `https://github.com/SortableJS/Vue.Draggable/blob/master/example/components/${component.name}.vue`
-                "
-              >
-                <button class="btn btn-secondary">
-                  View code
-                  <i class="fa fa-github icon-large"></i>
-                </button>
-              </a>
             </div>
-
-            <component :is="component.name"></component>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
+      </article>
+    </section>
+  </main>
 </template>
 
 <script>
@@ -156,139 +143,107 @@ export default {
       .filter(component => component.show)
       .sort((a, b) => a.order - b.order);
     return {
-      componentList
+      componentList,
+      currentComponent: componentList[0]
     };
   },
-  mounted() {
-    this.toRoute(this.$route);
-    $('a[data-toggle="tab"]').on("shown.bs.tab", e => {
-      this.$router.push({ path: e.target.dataset.route });
-    });
-  },
   methods: {
-    toRoute(route) {
-      $(`a[data-route="${route.path}"]`).tab("show");
-    }
-  },
-  watch: {
-    $route: function(route) {
-      this.toRoute(route);
+    setCurrentComponent(component) {
+      this.currentComponent = component;
     }
   }
 };
 </script>
 
 <style>
-#app .main-container {
-  padding-top: 40px;
+.header {
+  width: 100%;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  padding: 20px;
 }
-
-.main-application {
-  width: 400px;
-}
-
-.jumbotron.logo {
-  text-align: center;
-  padding-top: 32px;
-  padding-bottom: 16px;
-}
-
-.jumbotron.logo .draggable {
-  height: 200px;
-}
-
-.row.icon-container {
+.header .container {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  flex-direction: row;
-  padding-bottom: 15px;
-  margin-left: 0;
+  flex-direction: column;
 }
 
->>> h3 {
-  font-size: 1.4em;
+.header__logo {
+  max-width: 150px;
+  height: 150px;
+  margin-bottom: 20px;
 }
 
-a.github {
-  color: black;
-  float: left;
+.header__badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
 }
 
-.icon i {
-  font-size: 20px;
+.stage {
+  display: flex;
+  height: calc(100vh - 70px);
+  padding: 0 !important;
 }
 
-a {
-  color: black;
+.stage__sidebar {
+  padding: 20px;
+  width: 220px;
+  min-width: 220px;
+}
+.sidebar__list {
+  padding: 0;
+  list-style: none;
 }
 
-#badges {
-  text-align: center;
-  padding: 10px;
+.sidebar__list-item a,
+.sidebar__list-item a:hover {
+  display: flex;
+  width: 100%;
+  padding: 5px 12px;
+  margin: 4px 0;
+  border-radius: 2px;
+  color: #34495d;
+  text-decoration: none;
+}
+.sidebar__list-item.active a,
+.sidebar__list-item a:hover {
+  background: #34495d29;
 }
 
-#badges img {
-  padding-left: 2px;
-  padding-right: 2px;
+.stage__components {
+  border-left: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  padding: 20px 30px;
+  box-sizing: border-box;
+  flex-grow: 1;
+  overflow: auto;
+  position: relative;
+  background: #f9f9f9;
+}
+.stage__components--header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.stage__components--header h2 {
+  text-transform: capitalize;
+  font-size: 26px;
+}
+.stage__icon-github {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px 16px;
+  background: #6d757d;
+  color: #fff;
+  border: 1px solid #e2e8f0;
+  border-top: 0;
+  border-right: 0;
+  border-radius: 0 0 0 4px;
 }
 
-#tab-content {
-  min-height: 500px;
-}
-
-.tooltip[x-placement^="bottom"] {
-  margin-top: 5px;
-}
-
-.tooltip[x-placement^="bottom"] .tooltip-arrow {
-  border-width: 0 5px 5px 5px;
-  border-left-color: transparent !important;
-  border-right-color: transparent !important;
-  border-top-color: transparent !important;
-  top: -5px;
-  left: calc(50% - 5px);
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.tooltip[x-placement^="right"] {
-  margin-left: 5px;
-}
-
-.tooltip[x-placement^="right"] .tooltip-arrow {
-  border-width: 5px 5px 5px 0;
-  border-left-color: transparent !important;
-  border-top-color: transparent !important;
-  border-bottom-color: transparent !important;
-  left: -5px;
-  top: calc(50% - 5px);
-  margin-left: 0;
-  margin-right: 0;
-}
-
-.tooltip[x-placement^="left"] {
-  margin-right: 5px;
-}
-
-.tooltip[x-placement^="left"] .tooltip-arrow {
-  border-width: 5px 0 5px 5px;
-  border-top-color: transparent !important;
-  border-right-color: transparent !important;
-  border-bottom-color: transparent !important;
-  right: -5px;
-  top: calc(50% - 5px);
-  margin-left: 0;
-  margin-right: 0;
-}
-
-.tooltip[aria-hidden="true"] {
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 0.15s, visibility 0.15s;
-}
-
-.tooltip[aria-hidden="false"] {
-  visibility: visible;
-  opacity: 1;
-  transition: opacity 0.15s;
-}
 </style>
